@@ -17,11 +17,28 @@ def isVector(vtype):
     return False
 
 
+def isMap(vtype):
+    if vtype.find("std::map") != -1:
+        return True
+    return False
+
+
 def c_process_vector(vtype):
     if "std::vector" in vtype:
         vtype = vtype[6:]
         index = vtype.find(",")
         vtype = vtype[:index]
+        vtype += ">"
+    return vtype
+
+
+def c_process_map(vtype):
+    if "std::map" in vtype:
+        vtype = vtype[6:]
+        index = vtype.find(",")
+        end_index = vtype.find(",", index + 1)
+        vtype = vtype[:end_index]
+        vtype = vtype[:index+1] + " " + vtype[index+1:]
         vtype += ">"
     return vtype
 
@@ -38,8 +55,10 @@ def c_check_var(vtype):
             vtype = vtype.replace(key, replace_dict[key])
     if isEnum(vtype):
         vtype = vtype.replace("::Enum", "")
-    if(isVector(vtype)):
+    if isVector(vtype):
         vtype = c_process_vector(vtype)
+    if isMap(vtype):
+        vtype = c_process_map(vtype)
     return vtype
 
 
